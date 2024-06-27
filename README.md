@@ -44,7 +44,7 @@
 - Treasure Tiles addresses key challenges in the online gambling industry by leveraging blockchain technology to enhance trust, transparency, and global accessibility. Built on the Mode Network, the game uses smart contracts and verifiable random number generation to ensure fair play and transparent outcomes.
 
 # Solution
-- An ideal solution for the challenges faced by the online gambling industry would:
+An ideal solution for the challenges faced by the online gambling industry would:
 - Provide complete transparency in game mechanics and outcomes
 - Ensure provable fairness through blockchain technology and smart contracts
 - Offer robust security measures to protect user data and funds
@@ -55,10 +55,10 @@
 - Offer a scalable platform that can support multiple games
 - Ensure compliance with relevant regulations while maintaining decentralization
 
-- Treasure Tiles aims to meet these criteria by leveraging the Mode Network's blockchain technology, implementing transparent smart contracts, using verifiable random number generation, and creating an engaging user interface that bridges the gap between traditional online casinos and blockchain technology.
+Treasure Tiles aims to meet these criteria by leveraging the Mode Network's blockchain technology, implementing transparent smart contracts, using verifiable random number generation, and creating an engaging user interface that bridges the gap between traditional online casinos and blockchain technology.
 
 # Why it Matters
-- Our solution impacts the target audience in several significant ways:
+Our solution impacts the target audience in several significant ways:
 1. **Builds Trust**: By providing transparent and verifiable game mechanics, players can trust that the games are fair, potentially increasing player retention and attracting new users.
 2. **Enhances Security**: Blockchain technology and smart contracts provide a secure environment for transactions and data storage, reducing the risk of fraud and hacks.
 3. **Saves Money**: 
