@@ -23,15 +23,18 @@
 
 
 # About
+
 - Treasure Tiles is an innovative blockchain-based casino game built on the Mode Network. Inspired by Stake.com's Mine game, Treasure Tiles offers a unique and engaging gaming experience where players use their intuition to uncover hidden treasures.
 
 ### Key Benefits:
+
 - Transparent and provably fair gameplay
 - Enhanced security for user data and funds
 - Global accessibility without geographic restrictions
 - Blockchain-based trust model
 
 ## Features
+
 - Intuitive and engaging tile-based gameplay
 - Real-time blockchain interactions
 - Verifiable random number generation using Gelato VRF
@@ -41,9 +44,11 @@
 
 
 # Challenge
+
 - Treasure Tiles addresses key challenges in the online gambling industry by leveraging blockchain technology to enhance trust, transparency, and global accessibility. Built on the Mode Network, the game uses smart contracts and verifiable random number generation to ensure fair play and transparent outcomes.
 
 # Solution
+
 An ideal solution for the challenges faced by the online gambling industry would:
 - Provide complete transparency in game mechanics and outcomes
 - Ensure provable fairness through blockchain technology and smart contracts
@@ -58,6 +63,7 @@ An ideal solution for the challenges faced by the online gambling industry would
 Treasure Tiles aims to meet these criteria by leveraging the Mode Network's blockchain technology, implementing transparent smart contracts, using verifiable random number generation, and creating an engaging user interface that bridges the gap between traditional online casinos and blockchain technology.
 
 # Why it Matters
+
 Our solution impacts the target audience in several significant ways:
 1. **Builds Trust**: By providing transparent and verifiable game mechanics, players can trust that the games are fair, potentially increasing player retention and attracting new users.
 2. **Enhances Security**: Blockchain technology and smart contracts provide a secure environment for transactions and data storage, reducing the risk of fraud and hacks.
@@ -71,6 +77,7 @@ Our solution impacts the target audience in several significant ways:
 By addressing these key points, Treasure Tiles not only provides an engaging gaming experience but also solves critical issues in the online gambling industry, creating value for both players and operators.
 
 ## Examples
+
 - Homechain https://github.com/0xBcamp/March-2023-Lima
 - SmartVault https://github.com/0xBcamp/March-2023-Sierra
 - Blockbadge https://github.com/0xBcamp/Sept23_Apprenticeship_Certification
@@ -84,29 +91,48 @@ By addressing these key points, Treasure Tiles not only provides an engaging gam
   - You'll know you did it right if you can run `git --version` and you see a response like `git version x.x.x`
 - [foundry](https://getfoundry.sh/)
   - You'll know you did it right if you can run `forge --version` and you see a response like `forge 0.2.0 (816e00b 2023-03-16T00:05:26.396218Z)`
-<!-- Additional requirements here -->
+
 
 ## Installation
+1. Clone the repository
+   - git clone https://github.com/0xBcamp/jm-casino-games
+   - cd treasure-tiles
+3. Install dependencies: `npm install`
+4. Set up environment variables:
+- Copy `.env.example` to `.env`
+- Fill in the required variables
+4. Compile smart contracts: `forge build`
+5. Run tests: `forge test`
+6. Run the development server: `npm run dev`
 
-```bash
-git clone <MY_REPO>
-cd <MY_REPO>
-make
-```
+## Development
+### Smart Contract Development
+1. Navigate to the `contracts/` directory
+2. Modify or add Solidity contracts
+3. Compile contracts: `forge build`
+### Frontend Development
+1. Navigate to the `frontend/` directory
+2. Run the React development server: `npm start`
+### Backend Development
+1. Navigate to the `backend/` directory
+2. Run the Node.js server: `npm run server`
 
-## Quickstart 
+## Testing
+### Smart Contract Tests
+Run the Foundry tests: `forge test`
+### Frontend Tests
+Run React component tests: `npm test`
+### Integration Tests
+Run end-to-end tests: `npm run test:e2e`
 
-```bash
-make test
-```
-
-# Usage 
-
-## Coverage
-
-```bash
-forge test --report debug
-```
+## Deployment
+### Deploying Smart Contracts to Mode Network
+1. Ensure the wallet is funded with MODE tokens
+2. Update `foundry.toml` with the correct Mode Network RPC URL
+3. Run the deployment script
+### Deploying Frontend
+1.	Build the frontend: `npm run build`
+2. Deploy the built files to preferred hosting service (e.g., Vercel, Netlify)
 
 # Audit Scope Details 
 
@@ -122,8 +148,9 @@ make scope
   - XXX
 
 ## Roles
-
-- Role1: <!-- Description -->
+- Role1: Smart Contract Development
+- Role2: Backend Development
+- Role3: Frontend Development
 
 ## Known Issues
 
