@@ -7,6 +7,8 @@
 
 - [Treasure Tiles](#treasure-tiles)
 - [About](#about)
+    - [Key Benefits:](#key-benefits)
+  - [Features](#features)
 - [Challenge](#challenge)
 - [Solution](#solution)
 - [Why it Matters](#why-it-matters)
@@ -14,9 +16,17 @@
 - [Getting Started](#getting-started)
   - [Requirements](#requirements)
   - [Installation](#installation)
-  - [Quickstart](#quickstart)
-- [Usage](#usage)
-  - [Coverage](#coverage)
+  - [Development](#development)
+    - [Smart Contract Development](#smart-contract-development)
+    - [Frontend Development](#frontend-development)
+    - [Backend Development](#backend-development)
+  - [Testing](#testing)
+    - [Smart Contract Tests](#smart-contract-tests)
+    - [Frontend Tests](#frontend-tests)
+    - [Integration Tests](#integration-tests)
+  - [Deployment](#deployment)
+    - [Deploying Smart Contracts to Mode Network](#deploying-smart-contracts-to-mode-network)
+    - [Deploying Frontend](#deploying-frontend)
 - [Audit Scope Details](#audit-scope-details)
   - [Roles](#roles)
   - [Known Issues](#known-issues)
@@ -61,6 +71,10 @@ An ideal solution for the challenges faced by the online gambling industry would
 - Ensure compliance with relevant regulations while maintaining decentralization
 
 Treasure Tiles aims to meet these criteria by leveraging the Mode Network's blockchain technology, implementing transparent smart contracts, using verifiable random number generation, and creating an engaging user interface that bridges the gap between traditional online casinos and blockchain technology.
+
+<p align="center">
+<img src="./images/assets/architecture.png" width="500" alt="solution">
+<br/>
 
 # Why it Matters
 
