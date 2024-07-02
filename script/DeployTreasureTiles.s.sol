@@ -7,21 +7,13 @@ import { TreasureTiles } from "../src/TreasureTiles.sol";
 import { HelperConfig } from "../script/HelperConfig.s.sol";
 
 contract DeployTreasureTiles is Script {
-    HelperConfig helperConfig;
+    function run() external returns (TreasureTiles, HelperConfig) {
+        HelperConfig helperConfig = new HelperConfig();
 
-    constructor(address helperConfigAddress) {
-        helperConfig = HelperConfig(helperConfigAddress);
-    }
+        HelperConfig.NetworkConfig memory config = helperConfig.getActiveNetworkConfig();
 
-    function run() external returns (TreasureTiles) {
-        //HelperConfig.NetworkConfig memory config = helperConfig.getActiveNetworkConfig();
-        //If we use ownable or access control parameter needed would be (config.initialOwner)
-        TreasureTiles treasure = new TreasureTiles();
+        TreasureTiles treasure = new TreasureTiles(config.operator);
 
-        return treasure;
-    }
-
-    function getHelperConfig() external view returns (HelperConfig) {
-        return helperConfig;
+        return (treasure, helperConfig);
     }
 }

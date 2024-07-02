@@ -20,8 +20,8 @@ contract TreasureTilesTest is Test {
         helperConfig = new HelperConfig();
 
         //If we use ownable or access control parameter needed would be (address(config))
-        deployer = new DeployTreasureTiles(address(this));
-        treasure = deployer.run();
+        deployer = new DeployTreasureTiles();
+        (treasure, helperConfig) = deployer.run();
 
         vm.deal(PLAYER, STARTING_BALANCE);
         vm.deal(PLAYERTWO, STARTING_BALANCE);

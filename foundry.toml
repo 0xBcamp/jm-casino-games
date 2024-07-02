@@ -3,7 +3,10 @@ src = "src"
 out = "out"
 libs = ["lib"]
 solc = "0.8.24"
-remappings = ['@openzeppelin/contracts=lib/openzeppelin-contracts/contracts']
+remappings = [
+    '@openzeppelin/contracts=lib/openzeppelin-contracts/contracts',
+    'gelatodigital/vrf-contracts/contracts=lib/vrf-contracts/contracts',
+]
 # fs_permissions = [
 #     { access = "read", path = "./broadcast" },
 #     { access = "read", path = "./reports" },
@@ -51,6 +54,6 @@ mode = { key = "${API_KEY_MODESCAN}" }
 [rpc_endpoints]
 # example:
 # zksync = "https://mainnet.era.zksync.io"
-
+sepolia = "https://eth-sepolia.g.alchemy.com/v2/N-xInl4-MvlVwtClZjoMxNqFyiAP4PcZ"
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
