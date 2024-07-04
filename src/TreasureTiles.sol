@@ -48,7 +48,7 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
      * @param selectedBoxes An array of box IDs the player wishes to select, representing their choices in the game.
      * @param betAmount The amount of native token the player wishes to bet. This is exclusive of the service fee.
      */
-    function startGame(uint256[] memory selectedBoxes, uint256 betAmount) external payable {
+    function startGame(uint256[] memory selectedBoxes, uint256 betAmount) external payable nonReentrant {
         uint256 fee = betAmount * SERVICE_FEE / 1000;
         if (s_activeGames[msg.sender] != 0) {
             revert TreasureTiles__GameAlreadyExists();
