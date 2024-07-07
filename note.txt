@@ -1,0 +1,67 @@
+uint256[25] memory probabilities = [4, 78, 115, 150, 185, 217, ...]
+
+uint256 currentProb = probabilities[selectedTiles - 1] 
+
+
+1 - ((20/25)^n) - probabilities <= Use this to calculate probabilities array
+These to are the same
+1 - (0.8 ^ pickedTiles)
+
+
+
+
+I have to do i for all iterations 1-25 for the formula for exponential multipliers between 1 and 5
+i=0, result=1.0000
+i=1, result=1.0064
+i=2, result=1.0256
+i=3, result=1.0576
+i=4, result=1.1024
+i=5, result=1.1600
+i=6, result=1.2304
+i=7, result=1.3136
+i=8, result=1.4096
+i=9, result=1.5184
+i=10, result=1.6400
+i=11, result=1.7744
+i=12, result=1.9216
+i=13, result=2.0816
+i=14, result=2.2544
+i=15, result=2.4400
+i=16, result=2.6384
+i=17, result=2.8496
+i=18, result=3.0736
+i=19, result=3.3104
+i=20, result=3.5600
+i=21, result=3.8224
+i=22, result=4.0976
+i=23, result=4.3856
+i=24, result=4.6864
+i=25, result=5.0000
+
+n=0, result=0
+n=1, result=0.20
+n=2, result=0.36
+n=3, result=0.488
+n=4, result=0.5904
+n=5, result=0.67232
+n=6, result=0.737856
+n=7, result=0.7902848
+n=8, result=0.83222784
+n=9, result=0.865782272
+n=10, result=0.8926258176
+n=11, result=0.91410065408
+n=12, result=0.931280523264
+n=13, result=0.9450244186112
+n=14, result=0.95601953488896
+n=15, result=0.9648156279111679
+n=16, result=0.9718525023289344
+n=17, result=0.9774820018631475
+n=18, result=0.981985601490518
+n=19, result=0.9855884811924144
+n=20, result=0.9884707849539315
+n=21, result=0.9907766279631453
+n=22, result=0.9926213023705162
+n=23, result=0.9940970418964129
+n=24, result=0.9952776335171304
+n=25, result=0.9962221068137043
+
