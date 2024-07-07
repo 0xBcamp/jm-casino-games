@@ -30,7 +30,6 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
     address private s_operatorAddress; // Address of the operator
     uint256 private s_nextGameId = 1; // Incremental ID for each game
     uint256 private s_totalFees;
-    uint256 private gameVault;
 
     //10^16 exponential multipliers between 1 and 5
     uint256[25] private s_multipliers = [
@@ -60,7 +59,8 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
         9_952_776_335_171_304,
         9_962_221_068_137_043
     ];
-    //10^4 probabilities between 1 and 25
+
+    //10^4 probabilities of selected tiles
     uint256[25] private s_probabilities = [
         10_064,
         10_256,
@@ -121,10 +121,10 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
      * - `TreasureTiles__InvalidFundAmount` if the sent value does not match the required total of bet amount plus
      * service fee.
      *
-     * @param selectedBoxes The number representing the boxes selected by the player for this game session.
+     * @param selectedTiles The number representing the boxes selected by the player for this game session.
      * @param betAmount The amount of native token the player is betting, excluding the service fee.
      */
-    function startGame(uint256 selectedBoxes, uint256 betAmount) external payable nonReentrant {
+    function startGame(uint256 selectedTiles, uint256 betAmount) external payable nonReentrant {
         uint256 fee = (betAmount * SERVICE_FEE) / 1000;
         if (s_activeGames[msg.sender] != 0) {
             revert TreasureTiles__GameAlreadyExists();
@@ -132,7 +132,7 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
         if (betAmount <= 0) {
             revert TreasureTiles__InvalidBetAmount(betAmount);
         }
-        if (selectedBoxes <= 0 || selectedBoxes > MAX_BOXES) {
+        if (selectedTiles <= 0 || selectedTiles > MAX_BOXES) {
             revert TreasureTiles__InvalidBoxeSelection();
         }
         if (msg.value != betAmount + fee) {
@@ -144,8 +144,8 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
         s_gameBets[gameId] = betAmount;
         s_totalFees += fee;
 
-        // encode the extraData to get the selectedBoxes, betAmount, and gameId
-        _requestRandomness(abi.encode(selectedBoxes, betAmount, gameId));
+        // encode the extraData to get the selectedTiles, betAmount, and gameId
+        _requestRandomness(abi.encode(selectedTiles, betAmount, gameId));
 
         emit GameStarted(gameId, msg.sender, betAmount);
     }
@@ -164,7 +164,7 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
      *
      * @param randomness The random number provided by Gelato VRF, used to determine the game outcome.
      * @param requestId The ID of the VRF request, used to track the game outcome.
-     * @param extraData Encoded data containing the selectedBoxes (number of boxes chosen by the player),
+     * @param extraData Encoded data containing the selectedTiles (number of boxes chosen by the player),
      * betAmount (the amount of ETH wagered), and gameId (unique identifier for the game session).
      */
     function _fulfillRandomness(
@@ -177,25 +177,23 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
         override
         nonReentrant
     {
-        // Decode the extraData to get the selectedBoxes, betAmount, and gameId
-        (uint256 selectedBoxes, uint256 betAmount, uint256 gameId) = abi.decode(extraData, (uint256, uint256, uint256));
+        // Decode the extraData to get the selectedTiles, betAmount, and gameId
+        (uint256 selectedTiles, uint256 betAmount, uint256 gameId) = abi.decode(extraData, (uint256, uint256, uint256));
         uint256 normalizedValue = randomness % 1000;
-        uint256 currentProbability = s_probabilities[selectedBoxes - 1];
+        uint256 currentProbability = s_probabilities[selectedTiles - 1];
         uint256 wonAmount;
 
         if (normalizedValue < currentProbability) {
             // lost
-            gameVault += betAmount;
             s_requestIdOutcomes[requestId] = false; // Mark the game as lost
             emit GameOutcome(gameId, msg.sender, "Lost", 0); // Emitting event for loss
         } else {
             // won
-            wonAmount = (betAmount * s_multipliers[selectedBoxes - 1]) / 1e16;
-            if (gameVault < wonAmount) {
+            wonAmount = (betAmount * s_multipliers[selectedTiles - 1]) / 1e16;
+            if (address(this).balance < wonAmount) {
                 revert TreasureTiles__InsufficientFunds();
             }
 
-            gameVault -= wonAmount;
             (bool sent,) = msg.sender.call{ value: wonAmount }("");
 
             if (!sent) {
