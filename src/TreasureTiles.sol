@@ -14,7 +14,7 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
     // Custom errors for specific revert conditions
     error TreasureTiles__GameAlreadyExists();
     error TreasureTiles__InvalidBetAmount(uint256 betAmount);
-    error TreasureTiles__InvalidBoxeSelection();
+    error TreasureTiles__InvalidTileSelection();
     error TreasureTiles__InvalidFundAmount();
     error TreasureTiles__NoFeesToCollect();
     error TreasureTiles__FailedToCollectFees();
@@ -133,7 +133,7 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
             revert TreasureTiles__InvalidBetAmount(betAmount);
         }
         if (selectedTiles <= 0 || selectedTiles > MAX_BOXES) {
-            revert TreasureTiles__InvalidBoxeSelection();
+            revert TreasureTiles__InvalidTileSelection();
         }
         if (msg.value != betAmount + fee) {
             revert TreasureTiles__InvalidFundAmount();
