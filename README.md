@@ -31,6 +31,23 @@
   - [Roles](#roles)
   - [Known Issues](#known-issues)
 - [Contract Logic](#contract-logic)
+  - [Introduction](#introduction)
+  - [Overview](#overview)
+  - [Architecture](#architecture)
+  - [Contract Structure](#contract-structure)
+  - [Key Components](#key-components)
+  - [State Variables](#state-variables)
+  - [Functions](#functions)
+    - [Constructor](#constructor)
+    - [startGame](#startgame)
+    - [_fulfillRandomness](#_fulfillrandomness)
+    - [collectFees](#collectfees)
+    - [getFees](#getfees)
+    - [_operator](#_operator)
+  - [Events](#events)
+    - [GameStarted](#gamestarted)
+    - [GameOutcome](#gameoutcome)
+  - [Security Considerations](#security-considerations)
 
 
 # About
@@ -172,3 +189,98 @@ make scope
 - Issue1: <!-- Description -->
 
 ##  Contract Logic
+
+  ### Introduction
+The treasure tiles contract is a casino game contract that allows users to bet and select boxes in hopes of finding treasures.
+
+  ### Overview 
+The TreasureTiles contract is a blockchain-based game where players place bets and select boxes in hopes of finding treasures. The game leverages Gelato's Verifiable Random Function (VRF) to ensure fair randomness in determining the outcomes of the game. The contract also incorporates security measures through OpenZeppelin's ReentrancyGuard and Ownable contracts.
+
+### Architecture
+
+ ### Contract Structure
+The contract is structured as follows:
+
+- Inheritance: Inherits from GelatoVRFConsumerBase for randomness, ReentrancyGuard for preventing reentrant calls, and Ownable for access control.
+
+- State Variables: Manages game states, bet amounts, and outcomes.
+
+- Functions: Includes game initialization, randomness fulfillment, and fee management functions.
+
+- Events: Logs significant actions and outcomes within the game.
+
+### Key Components
+ 
+ ### State Variables
+
+- s_activeGames: Tracks active game IDs for each player.
+- s_gameBets: Stores bet amounts for each game ID.
+- s_requestIdOutcomes: Maps request IDs to game outcomes.
+- MAX_BOXES: Constant defining the maximum number of boxes a player can select.
+- SERVICE_FEE: Constant representing the service fee percentage.
+- s_operatorAddress: Address of the game operator.
+- s_nextGameId: Incremental game ID.
+- s_totalFees: Accumulated service fees.
+- s_multipliers: Array of multipliers for different box selections.
+- s_probabilities: Array of probabilities for different box selections.
+
+  ### Functions
+
+- constructor: Initializes the contract with operator and owner addresses.
+- startGame: Initiates a new game session.
+- _fulfillRandomness: Handles randomness fulfillment and determines game outcomes.
+- collectFees: Allows the owner to withdraw accumulated service fees.
+- getFees: Returns the total accumulated service fees.
+- _operator: Internal function to get the operator's address.
+
+  ### Events
+
+- GameStarted: Emitted when a new game starts.
+- GameOutcome: Emitted when a game concludes.
+
+### Functions
+
+- Constructor
+Purpose: Initializes the contract with the operator and owner addresses.
+![ Constructor Code](image.png)
+
+- startGame
+Purpose: Initiates a new game session for a player by accepting a bet and selected boxes.
+![Start game code ](image-1.png)
+
+- _fulfillRandomness
+Purpose: Handles the randomness fulfillment from Gelato VRF and determines the game outcome.
+![fulfil randomness](image-2.png)
+
+- collectFees
+Purpose: Transfers all accumulated service fees to the contract owner.
+![collect fees](image-3.png)
+
+- getFees
+Purpose: Returns the total amount of service fees accumulated in the contract.
+![get fees](image-4.png)
+
+- _operator
+Purpose: Internal view function to return the operator's address.
+![operator](image-5.png)
+
+### Event 
+
+- GameStarted
+Emitted when a new game session starts.
+![Game started](image-6.png)
+
+- GameOutcome
+Emitted when a game session concludes.
+![Game outcome](image-7.png)
+
+### Security Considerations
+- Reentrancy Protection
+Uses ReentrancyGuard to prevent reentrant calls, ensuring state changes are protected against attacks.
+
+- Access Control
+Functions managing the game mechanics are restricted to the contract owner or operator using the Ownable contract.
+
+- Fund Management
+Ensures sufficient funds are available before attempting to payout winnings.
+Accumulated service fees are only accessible by the contract owner, ensuring secure fund management.
