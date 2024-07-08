@@ -30,6 +30,7 @@
 - [Audit Scope Details](#audit-scope-details)
   - [Roles](#roles)
   - [Known Issues](#known-issues)
+- [Contract Logic](#contract-logic)
 
 
 # About
@@ -169,3 +170,5 @@ make scope
 ## Known Issues
 
 - Issue1: <!-- Description -->
+
+##  Contract Logic
