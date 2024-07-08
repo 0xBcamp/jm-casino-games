@@ -94,8 +94,10 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
     event GameOutcome(uint256 indexed gameId, address indexed player, string indexed outcome, uint256 amount);
 
     /**
-     * @dev Constructor for initializing the TreasureTiles contract with the operator's address.
-     * @param operator Address of the operator responsible for managing the game.
+     * @dev Initializes the TreasureTiles contract, setting the operator and the initial owner.
+     * Inherits initialization from GelatoVRFConsumerBase and Ownable contracts.
+     * @param operator The address of the operator responsible for managing game mechanics.
+     * @param initialOwner The address of the initial owner with administrative privileges.
      */
     constructor(address operator, address initialOwner) GelatoVRFConsumerBase() Ownable(initialOwner) {
         s_operatorAddress = operator;
