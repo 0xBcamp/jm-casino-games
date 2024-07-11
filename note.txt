@@ -5,6 +5,13 @@ uint256 currentProb = probabilities[selectedTiles - 1]
 
 1 - ((20/25)^n) - probabilities <= Use this to calculate probabilities array
 These to are the same
+
+1-((20/25)^1) = 0.20
+1-0.20= .80 => 80% of winning
+
+1-((20/25)^6) = 0.74
+1-0.74= 26%
+
 1 - (0.8 ^ pickedTiles)
 
 
@@ -38,6 +45,8 @@ i=23, result=4.3856
 i=24, result=4.6864
 i=25, result=5.0000
 
+
+Losing % chance:
 n=0, result=0
 n=1, result=0.20
 n=2, result=0.36
@@ -64,4 +73,3 @@ n=22, result=0.9926213023705162
 n=23, result=0.9940970418964129
 n=24, result=0.9952776335171304
 n=25, result=0.9962221068137043
-

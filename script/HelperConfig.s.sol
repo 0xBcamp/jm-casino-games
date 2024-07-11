@@ -15,7 +15,6 @@ contract HelperConfig is Script {
     //////////////////////////////////////////////////////////////*/
     struct NetworkConfig {
         address initialOwner;
-        address operator;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -66,36 +65,36 @@ contract HelperConfig is Script {
     /*//////////////////////////////////////////////////////////////
                                 CONFIGS
     //////////////////////////////////////////////////////////////*/
-    function getEthMainnetConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), operator: address(2) });
+    function getEthMainnetConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({ initialOwner: address(msg.sender) });
     }
 
-    function getEthSepoliaConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), operator: address(2) });
+    function getEthSepoliaConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({ initialOwner: address(msg.sender) });
     }
 
-    function getZkSyncConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), operator: address(2) });
+    function getZkSyncConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({ initialOwner: address(msg.sender) });
     }
 
-    function getZkSyncSepoliaConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), operator: address(2) });
+    function getZkSyncSepoliaConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({ initialOwner: address(msg.sender) });
     }
 
-    function getPolygonMainnetConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), operator: address(2) });
+    function getPolygonMainnetConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({ initialOwner: address(msg.sender) });
     }
 
-    function getPolygonMumbaiConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), operator: address(2) });
+    function getPolygonMumbaiConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({ initialOwner: address(msg.sender) });
     }
 
-    function getModeMainnetConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), operator: address(2) });
+    function getModeMainnetConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({ initialOwner: address(msg.sender) });
     }
 
-    function getModeSepoliaConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), operator: address(2) });
+    function getModeSepoliaConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({ initialOwner: address(msg.sender) });
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -110,7 +109,7 @@ contract HelperConfig is Script {
 
         _deployMocks();
 
-        localNetworkConfig = NetworkConfig({ initialOwner: address(1), operator: address(2) });
+        localNetworkConfig = NetworkConfig({ initialOwner: address(msg.sender) });
         return localNetworkConfig;
     }
 

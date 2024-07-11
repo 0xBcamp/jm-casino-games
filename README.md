@@ -30,24 +30,18 @@
 - [Audit Scope Details](#audit-scope-details)
   - [Roles](#roles)
   - [Known Issues](#known-issues)
-- [Contract Logic](#contract-logic)
-  - [Introduction](#introduction)
-  - [Overview](#overview)
-  - [Architecture](#architecture)
-  - [Contract Structure](#contract-structure)
-  - [Key Components](#key-components)
-  - [State Variables](#state-variables)
-  - [Functions](#functions)
-    - [Constructor](#constructor)
-    - [startGame](#startgame)
-    - [_fulfillRandomness](#_fulfillrandomness)
-    - [collectFees](#collectfees)
-    - [getFees](#getfees)
-    - [_operator](#_operator)
-  - [Events](#events)
-    - [GameStarted](#gamestarted)
-    - [GameOutcome](#gameoutcome)
-  - [Security Considerations](#security-considerations)
+  - [Contract Logic](#contract-logic)
+    - [Introduction](#introduction)
+    - [Overview](#overview)
+    - [Architecture](#architecture)
+    - [Contract Structure](#contract-structure)
+    - [Key Components](#key-components)
+    - [State Variables](#state-variables)
+    - [Functions](#functions)
+    - [Events](#events)
+    - [Functions](#functions-1)
+    - [Event](#event)
+    - [Security Considerations](#security-considerations)
 
 
 # About
@@ -242,37 +236,37 @@ The contract is structured as follows:
 
 - Constructor
 Purpose: Initializes the contract with the operator and owner addresses.
-![ Constructor Code](image.png)
+![ Constructor Code](/images/image.png)
 
 - startGame
 Purpose: Initiates a new game session for a player by accepting a bet and selected boxes.
-![Start game code ](image-1.png)
+![Start game code ](/images/image-1.png)
 
 - _fulfillRandomness
 Purpose: Handles the randomness fulfillment from Gelato VRF and determines the game outcome.
-![fulfil randomness](image-2.png)
+![fulfil randomness](/images/image-2.png)
 
 - collectFees
 Purpose: Transfers all accumulated service fees to the contract owner.
-![collect fees](image-3.png)
+![collect fees](/images/image-3.png)
 
 - getFees
 Purpose: Returns the total amount of service fees accumulated in the contract.
-![get fees](image-4.png)
+![get fees](/images/image-4.png)
 
 - _operator
 Purpose: Internal view function to return the operator's address.
-![operator](image-5.png)
+![operator](/images/image-5.png)
 
 ### Event 
 
 - GameStarted
 Emitted when a new game session starts.
-![Game started](image-6.png)
+![Game started](/images/image-6.png)
 
 - GameOutcome
 Emitted when a game session concludes.
-![Game outcome](image-7.png)
+![Game outcome](/images/image-7.png)
 
 ### Security Considerations
 - Reentrancy Protection

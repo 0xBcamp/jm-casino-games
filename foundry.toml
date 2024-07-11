@@ -19,7 +19,7 @@ remappings = [
 # Then paste in the private key
 # create a password for the wallet you called "NAME_OF_FILE"
 #
-# To check what aacount you have type the following in the terminal `cast wallet list`
+# To check what acount you have type the following in the terminal `cast wallet list`
 #
 # So when running the deployment script on localhost or testnet it would look something like this,
 # forge script script/ContractScriptName.s.sol:ContractScriptName --rpc-url $(SEPOLIA_RPC_URL) --sender PUBLIC_ADDRESS_OF_ACCOUNT_YOU_IMPORTED --account NAME_OF_FILE --etherscan-api-key $(ETHERSCAN_API_KEY) --verify --broadcast
