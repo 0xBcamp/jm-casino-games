@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.btn {
+  @apply bg-gray-400;
+}
+
+.btn:not([data-state="unclicked"]) {
+  @apply bg-gray-500;
+}
+
+.btn:not([data-state="unclicked"]):before {
+  @apply bg-gray-400;
+}
+
+.btn:before {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  transform: translateY(-0.25rem);
+  z-index: -1;
+  @apply bg-gray-300 rounded-lg;
+}
+
+.btn:hover {
+  transform: translateY(-0.25rem);
+}
+
+.btn:active {
+  transform: translateY(0);
+  transition: transform 0.1s;
+}
+
+.btn:active:hover {
+  transform: translateY(-0.125rem);
+}
