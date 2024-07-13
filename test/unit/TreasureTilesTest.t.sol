@@ -18,8 +18,8 @@ contract TreasureTilesTest is Test {
     uint256 constant BET_AMOUNT = 1 ether;
     uint256 constant SELECTED_FOUR_TILES = 4;
     uint256 constant SELECTED_SIX_TILES = 6;
-    uint256 constant INVALID_TILES = 26;
-    uint256 constant INVALID_BET_AMOUNT = 0;
+    uint256 constant INVALID_TILES = 0;
+    uint256 constant INVALID_BET_AMOUNT = 0 ether;
     uint256 constant SERVICE_FEE = 5;
     uint256 gameId = 1;
     address PLAYER = makeAddr("player");
@@ -39,11 +39,23 @@ contract TreasureTilesTest is Test {
         vm.deal(address(deployer), STARTING_BALANCE);
     }
 
-    modifier PlayerIsPlayingAtTheSameTime() {
-        vm.startPrank(PLAYER);
-        treasure.startGame{ value: BET_AMOUNT }(SELECTED_FOUR_TILES);
-        vm.stopPrank();
-        _;
+    function testRandomnessRequestAndFulfillment() public {
+        // Request randomness
+        uint256 requestId = mockVRFConsumer.requestRandomness("0x123");
+        console2.log("Request ID:", requestId);
+
+        // Simulate randomness fulfillment
+        uint256 randomness = 123_456;
+        bytes memory extraData = "0x123";
+        mockVRFConsumer.testFulfillRandomness(randomness, requestId, extraData);
+
+        // Check state changes
+        assertEq(mockVRFConsumer.latestRandomness(), randomness, "Randomness should match");
+        assertEq(mockVRFConsumer.latestRequestId(), requestId, "Request ID should match");
+        assertEq(mockVRFConsumer.latestExtraData(), extraData, "Extra data should match");
+
+        // Additional checks for contract's state
+        // ...
     }
 
     function testStartGameTreasureTiles__InvalidTileSelection() public {
@@ -62,10 +74,12 @@ contract TreasureTilesTest is Test {
         vm.stopPrank();
     }
 
-    function testStartGameTreasureTiles__GameAlreadyExists() public PlayerIsPlayingAtTheSameTime {
+    function testStartGameTreasureTiles__GameAlreadyExists() public {
         vm.startPrank(PLAYER);
-        vm.expectRevert(TreasureTiles.TreasureTiles__GameAlreadyExists.selector);
         treasure.startGame{ value: BET_AMOUNT }(SELECTED_FOUR_TILES);
+
+        vm.expectRevert(TreasureTiles.TreasureTiles__GameAlreadyExists.selector);
+        treasure.startGame{ value: BET_AMOUNT }(SELECTED_SIX_TILES);
         vm.stopPrank();
     }
 
@@ -77,15 +91,15 @@ contract TreasureTilesTest is Test {
         vm.stopPrank();
     }
 
-    function testStartGame() public {
-        // vm.startPrank(PLAYER);
-        // treasure.startGame{ value: BET_AMOUNT }(SELECTED_FOUR_TILES);
-        // bytes memory extraData = abi.encode(SELECTED_FOUR_TILES, BET_AMOUNT, gameId);
-        // uint256 requestId = mockVRFConsumer.requestRandomness(extraData);
-        // uint256 mockRandomness = 123;
-        // mockVRFConsumer.testFulfillRandomness(mockRandomness, requestId, extraData);
-        // vm.expectRevert(TreasureTiles.TreasureTiles__GameAlreadyExists.selector);
-        // vm.stopPrank();
+    function testStartGameFunction() public {
+        vm.startPrank(PLAYER);
+        treasure.startGame{ value: BET_AMOUNT }(SELECTED_FOUR_TILES);
+        bytes memory extraData = abi.encode(SELECTED_FOUR_TILES, BET_AMOUNT, gameId);
+        uint256 requestId = mockVRFConsumer.requestRandomness(extraData);
+        uint256 mockRandomness = 123;
+        mockVRFConsumer.testFulfillRandomness(mockRandomness, requestId, extraData);
+        vm.expectRevert(TreasureTiles.TreasureTiles__GameAlreadyExists.selector);
+        vm.stopPrank();
     }
 
     function testCollectFeesTreasureTiles__NoFeesToCollect() public { }

@@ -32,7 +32,7 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
     uint256 private s_totalFees;
 
     //probabilities of selected tiles
-    uint256[25] private s_multipliers = [
+    uint256[25] private s_probabilities = [
         200_000_000_000_000_000,
         360_000_000_000_000_000,
         488_000_000_000_000_000,
@@ -61,7 +61,7 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
     ];
 
     //exponential multipliers between 1 and 5
-    uint256[25] private s_probabilities = [
+    uint256[25] private s_multipliers = [
         1_006_400_000_000_000_000,
         1_025_600_000_000_000_000,
         1_057_600_000_000_000_000,
@@ -144,7 +144,7 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
 
         // encode the extraData to get the selectedTiles, betAmount, and gameId
         bytes memory data = abi.encode(selectedTiles, betAmount, gameId);
-        //_requestRandomness(data);
+        _requestRandomness(data);
 
         emit GameStarted(gameId, msg.sender, betAmount);
     }
@@ -177,48 +177,6 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
     {
         // Decode the extraData to get the selectedTiles, betAmount, and gameId
         (uint256 selectedTiles, uint256 betAmount, uint256 gameId) = abi.decode(data, (uint256, uint256, uint256));
-        if (selectedTiles == 0 || selectedTiles > MAX_BOXES) {
-            revert TreasureTiles__InvalidTileSelection();
-        }
-        if (betAmount == 0) {
-            revert TreasureTiles__BetAmountCantBeZero(betAmount);
-        }
-        uint256 normalizedValue = randomness % 1000;
-        uint256 currentProbability = s_probabilities[selectedTiles - 1];
-        uint256 wonAmount;
-
-        if (normalizedValue * 1e18 < currentProbability) {
-            // lost
-            emit GameOutcome(gameId, msg.sender, "Lost", 0); // Emitting event for loss
-        } else {
-            // won
-            wonAmount = betAmount * s_multipliers[selectedTiles - 1];
-
-            if (wonAmount < betAmount) {
-                revert TreasureTiles__UnderflowError();
-            }
-            uint256 fee = (wonAmount * SERVICE_FEE) / 10_000;
-            wonAmount -= fee; // Deducting service fee from the winning amount
-
-            if (wonAmount < 0) {
-                revert TreasureTiles__UnderflowError(); // Ensure wonAmount remains positive
-            }
-
-            if (address(this).balance < wonAmount) {
-                revert TreasureTiles__InsufficientFunds();
-            }
-
-            (bool sent,) = msg.sender.call{ value: wonAmount }("");
-
-            if (!sent) {
-                revert TreasureTiles__TransactionFailed();
-            }
-            s_totalFees += fee;
-            emit GameOutcome(gameId, msg.sender, "Won", wonAmount); // Emitting event for win
-        }
-
-        delete s_activeGames[msg.sender];
-        delete s_gameBets[gameId];
     }
 
     /**
