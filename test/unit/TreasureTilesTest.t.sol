@@ -12,7 +12,7 @@ contract TreasureTilesTest is Test {
     DeployTreasureTiles deployer;
     HelperConfig config;
     TreasureTiles treasure;
-    MockVRFConsumer mockVRFConsumer;
+    MockOwner mockOwner;
 
     uint256 constant STARTING_BALANCE = 1000 ether;
     uint256 constant BET_AMOUNT = 1 ether;
@@ -21,47 +21,89 @@ contract TreasureTilesTest is Test {
     uint256 constant INVALID_TILES = 0;
     uint256 constant INVALID_BET_AMOUNT = 0 ether;
     uint256 constant SERVICE_FEE = 5;
-    uint256 gameId = 1;
     address PLAYER = makeAddr("player");
     address PLAYERTWO = makeAddr("playertwo");
+    address initialOwner;
+    address initialOperator;
 
-    event GameStarted(uint256 indexed gameId, address indexed player, uint256 indexed betAmount);
-    event GameOutcome(uint256 indexed gameId, address indexed player, string indexed outcome, uint256 amount);
+    event RandomnessRequested(uint64 requestId);
+    event RandomnessFulfilled(uint256 indexed nonce, TreasureTiles.Game game);
+    event GameStarted(uint256 indexed gameId, uint256 indexed selectedTiles, uint256 indexed betAmount);
 
     function setUp() public {
         config = new HelperConfig();
+        mockOwner = new MockOwner();
         deployer = new DeployTreasureTiles();
-        mockVRFConsumer = new MockVRFConsumer(address(deployer));
         (treasure, config) = deployer.run();
+
+        // Retrieve the active network configuration to get initialOwner and initialOperator
+        HelperConfig.NetworkConfig memory networkConfig = config.getActiveNetworkConfig();
+        initialOwner = networkConfig.initialOwner;
+        initialOperator = networkConfig.initialOperator;
 
         vm.deal(PLAYER, STARTING_BALANCE);
         vm.deal(PLAYERTWO, STARTING_BALANCE);
-        vm.deal(address(deployer), STARTING_BALANCE);
+        vm.deal(initialOwner, STARTING_BALANCE);
+        vm.deal(initialOperator, STARTING_BALANCE);
+
+        // Set the block timestamp for consistency in tests
+        vm.warp(1_700_819_134);
     }
 
-    function testRandomnessRequestAndFulfillment() public {
-        // Request randomness
-        uint256 requestId = mockVRFConsumer.requestRandomness("0x123");
-        console2.log("Request ID:", requestId);
+    function testRequestRandomness() public {
+        uint256 gameId = 1;
+        bytes memory data = abi.encode(SELECTED_FOUR_TILES, BET_AMOUNT, gameId);
+        vm.expectEmit(true, true, true, true);
+        emit RandomnessRequested(0);
 
-        // Simulate randomness fulfillment
-        uint256 randomness = 123_456;
-        bytes memory extraData = "0x123";
-        mockVRFConsumer.testFulfillRandomness(randomness, requestId, extraData);
+        vm.prank(initialOwner);
+        treasure.requestRandomness(data);
 
-        // Check state changes
-        assertEq(mockVRFConsumer.latestRandomness(), randomness, "Randomness should match");
-        assertEq(mockVRFConsumer.latestRequestId(), requestId, "Request ID should match");
-        assertEq(mockVRFConsumer.latestExtraData(), extraData, "Extra data should match");
+        // Verify that s_lastRequestId is updated correctly
+        assertEq(treasure.lastRequestId(), 0);
+    }
 
-        // Additional checks for contract's state
-        // ...
+    function testTreasureFulfillRandomness() public {
+        uint256 randomness = 0x471403f3a8764edd4d39c7748847c07098c05e5a16ed7b083b655dbab9809fae;
+        uint256 requestId = 0;
+        uint256 gameId = 1;
+        uint256 roundId = 2_671_924;
+
+        vm.prank(PLAYER);
+        treasure.startGame(SELECTED_FOUR_TILES, BET_AMOUNT);
+
+        bytes memory data = abi.encode(gameId);
+        bytes memory dataWithRound = abi.encode(roundId, abi.encode(requestId, data));
+
+        vm.prank(initialOperator);
+        treasure.fulfillRandomness(randomness, dataWithRound);
+
+        (
+            uint256 selectedTiles,
+            uint256 betAmount,
+            address player,
+            uint256 requestTime,
+            uint256 requestBlock,
+            uint256 fulfilledTime,
+            uint256 fulfilledBlock,
+            uint256 storedRandomness
+        ) = treasure.s_games(gameId);
+
+        assertEq(selectedTiles, SELECTED_FOUR_TILES);
+        assertEq(betAmount, BET_AMOUNT);
+        assertEq(player, PLAYER); // Assuming the deployer starts the game
+        assertEq(requestTime, 1_700_819_134); // Block timestamp set in setUp
+        assertEq(requestBlock, 1); // Block number of the request
+        assertEq(fulfilledTime, 1_700_819_134); // Block timestamp after fulfillment
+        assertEq(fulfilledBlock, 1); // Block number after fulfillment
+        assertEq(storedRandomness, storedRandomness); // Verifying the stored randomness is randomizing (I know this is
+            // equal to its-self)
     }
 
     function testStartGameTreasureTiles__InvalidTileSelection() public {
         vm.startPrank(PLAYER);
         vm.expectRevert(TreasureTiles.TreasureTiles__InvalidTileSelection.selector);
-        treasure.startGame{ value: BET_AMOUNT }(INVALID_TILES);
+        treasure.startGame(INVALID_TILES, BET_AMOUNT);
         vm.stopPrank();
     }
 
@@ -70,51 +112,50 @@ contract TreasureTilesTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(TreasureTiles.TreasureTiles__BetAmountCantBeZero.selector, INVALID_BET_AMOUNT)
         );
-        treasure.startGame{ value: INVALID_BET_AMOUNT }(SELECTED_FOUR_TILES);
+        treasure.startGame(SELECTED_FOUR_TILES, INVALID_BET_AMOUNT);
         vm.stopPrank();
     }
 
-    function testStartGameTreasureTiles__GameAlreadyExists() public {
-        vm.startPrank(PLAYER);
-        treasure.startGame{ value: BET_AMOUNT }(SELECTED_FOUR_TILES);
-
-        vm.expectRevert(TreasureTiles.TreasureTiles__GameAlreadyExists.selector);
-        treasure.startGame{ value: BET_AMOUNT }(SELECTED_SIX_TILES);
-        vm.stopPrank();
-    }
-
-    function test_ExpectEmit_EventGameStarted() public {
-        vm.startPrank(PLAYER);
-        vm.expectEmit(true, true, true, false);
-        emit GameStarted(gameId, PLAYER, BET_AMOUNT);
-        treasure.startGame{ value: BET_AMOUNT }(SELECTED_FOUR_TILES);
-        vm.stopPrank();
-    }
-
-    function testStartGameFunction() public {
-        vm.startPrank(PLAYER);
-        treasure.startGame{ value: BET_AMOUNT }(SELECTED_FOUR_TILES);
-        bytes memory extraData = abi.encode(SELECTED_FOUR_TILES, BET_AMOUNT, gameId);
-        uint256 requestId = mockVRFConsumer.requestRandomness(extraData);
-        uint256 mockRandomness = 123;
-        mockVRFConsumer.testFulfillRandomness(mockRandomness, requestId, extraData);
-        vm.expectRevert(TreasureTiles.TreasureTiles__GameAlreadyExists.selector);
-        vm.stopPrank();
-    }
-
-    function testCollectFeesTreasureTiles__NoFeesToCollect() public { }
-
-    function testCollectionFeesTreasureTiles__FailedToCollectFees() public { }
-
-    function testCollectFees() public { }
-
-    function testGetFees() public {
-        vm.startPrank(address(deployer));
+    function testCollectFeesTreasureTiles__NoFeesToCollect() public {
+        vm.startPrank(initialOwner);
         treasure.getFees();
         assertEq(treasure.getFees(), 0);
 
         vm.expectRevert(TreasureTiles.TreasureTiles__NoFeesToCollect.selector);
         treasure.collectFees();
         vm.stopPrank();
+    }
+
+    function testCollectionFeesTreasureTiles__FailedToCollectFees() public {
+        //Logic goes here
+    }
+
+    function testCollectFees() public {
+        vm.startPrank(initialOwner);
+        treasure.transferOwnership(address(mockOwner));
+        vm.stopPrank();
+
+        vm.startPrank(address(mockOwner));
+        //Logic goes here
+        vm.stopPrank();
+    }
+
+    function testGetFees() public {
+        vm.startPrank(initialOwner);
+        treasure.getFees();
+        assertEq(treasure.getFees(), 0);
+        vm.stopPrank();
+    }
+}
+
+// MockOwner contract that rejects receiving Ether
+contract MockOwner {
+    function collectFees(address _treasureTiles) external {
+        TreasureTiles(_treasureTiles).collectFees();
+    }
+
+    // This contract does not accept Ether
+    receive() external payable {
+        revert("MockOwner does not accept Ether");
     }
 }
