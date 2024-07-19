@@ -15,6 +15,8 @@ contract HelperConfig is Script {
     //////////////////////////////////////////////////////////////*/
     struct NetworkConfig {
         address initialOwner;
+        address initialOperator;
+        address feeRecipient;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -66,35 +68,67 @@ contract HelperConfig is Script {
                                 CONFIGS
     //////////////////////////////////////////////////////////////*/
     function getEthMainnetConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(msg.sender) });
+        return NetworkConfig({
+            initialOwner: address(msg.sender),
+            initialOperator: address(0x1),
+            feeRecipient: address(0x9Eba95858162442143864669E6611A6a50DdeeC8)
+        });
     }
 
     function getEthSepoliaConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(msg.sender) });
+        return NetworkConfig({
+            initialOwner: address(msg.sender),
+            initialOperator: address(0x1),
+            feeRecipient: address(0x9Eba95858162442143864669E6611A6a50DdeeC8)
+        });
     }
 
     function getZkSyncConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(msg.sender) });
+        return NetworkConfig({
+            initialOwner: address(msg.sender),
+            initialOperator: address(0x1),
+            feeRecipient: address(0x9Eba95858162442143864669E6611A6a50DdeeC8)
+        });
     }
 
     function getZkSyncSepoliaConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(msg.sender) });
+        return NetworkConfig({
+            initialOwner: address(msg.sender),
+            initialOperator: address(0x1),
+            feeRecipient: address(0x9Eba95858162442143864669E6611A6a50DdeeC8)
+        });
     }
 
     function getPolygonMainnetConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(msg.sender) });
+        return NetworkConfig({
+            initialOwner: address(msg.sender),
+            initialOperator: address(0x1),
+            feeRecipient: address(0x9Eba95858162442143864669E6611A6a50DdeeC8)
+        });
     }
 
     function getPolygonMumbaiConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(msg.sender) });
+        return NetworkConfig({
+            initialOwner: address(msg.sender),
+            initialOperator: address(0x1),
+            feeRecipient: address(0x9Eba95858162442143864669E6611A6a50DdeeC8)
+        });
     }
 
     function getModeMainnetConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(msg.sender) });
+        return NetworkConfig({
+            initialOwner: address(msg.sender),
+            initialOperator: address(0x1),
+            feeRecipient: address(0x9Eba95858162442143864669E6611A6a50DdeeC8)
+        });
     }
 
     function getModeSepoliaConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(msg.sender) });
+        return NetworkConfig({
+            initialOwner: address(msg.sender),
+            initialOperator: address(0x1),
+            feeRecipient: address(0x9Eba95858162442143864669E6611A6a50DdeeC8)
+        });
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -109,7 +143,11 @@ contract HelperConfig is Script {
 
         _deployMocks();
 
-        localNetworkConfig = NetworkConfig({ initialOwner: address(msg.sender) });
+        localNetworkConfig = NetworkConfig({
+            initialOwner: address(msg.sender),
+            initialOperator: address(0x1),
+            feeRecipient: address(0x9Eba95858162442143864669E6611A6a50DdeeC8)
+        });
         return localNetworkConfig;
     }
 
