@@ -12,12 +12,10 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
     // Custom errors for specific revert conditions
-    error TreasureTiles__BetAmountCantBeZero(uint256 betAmount);
+    error TreasureTiles__BetAmountCantBeZero();
     error TreasureTiles__InvalidTileSelection();
-    error TreasureTiles__GameAlreadyExists();
     error TreasureTiles__NoFeesToCollect();
     error TreasureTiles__FailedToCollectFees();
-    error TreasureTiles__InsufficientFunds();
     error TreasureTiles__TransactionFailed();
     error TreasureTiles__RandomnessRequestMismatch(uint256 lastRequestId, uint256 _requestId);
     error TreasureTiles__GameDoesNotExist();
@@ -40,10 +38,14 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
     uint256 private constant SERVICE_FEE = 5; // Service fee percentage => 0.5%
     uint256 private constant ONE_E_EIGHTEEN = 1e18;
     uint256 private constant ONE_E_FIFTEEN = 1e15;
+    uint256 private constant ONE_E_THREE = 1e3;
     uint256 private constant ONE_THOUSAND = 1000;
     address private immutable i_operatorAddress; // Address of the operator
     uint256 private s_nextGameId = 0; // Incremental ID for each game
     uint256 private s_totalFees;
+    uint256 private s_liquidityPool; // game liquidity
+    address public feeRecipient;
+
     uint256 public nonce;
     bytes32 public latestRandomness;
     uint64 public lastRequestId;
@@ -107,12 +109,24 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
     ];
 
     // Events
-    event RandomnessRequested(uint64 requestId);
+    event RandomnessRequested(uint64 indexed requestId);
     event RandomnessFulfilled(uint256 indexed nonce, Game);
-    event GameStarted(uint256 indexed gameId, uint256 indexed selectedTiles, uint256 indexed betAmount);
+    event FeeCollected(uint256 indexed amount);
 
-    constructor(address initialOwner, address initialOperator) GelatoVRFConsumerBase() Ownable(initialOwner) {
-        i_operatorAddress = initialOperator;
+    constructor(
+        address initialOwner,
+        address _initialOperator,
+        address _feeRecipient
+    )
+        GelatoVRFConsumerBase()
+        Ownable(initialOwner)
+    {
+        i_operatorAddress = _initialOperator;
+        feeRecipient = _feeRecipient;
+    }
+
+    function updateFeeRecipient(address newFeeRecipient) external onlyOwner {
+        feeRecipient = newFeeRecipient;
     }
 
     function startGame(uint256 selectedTiles, uint256 betAmount) external payable {
@@ -121,7 +135,7 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
             revert TreasureTiles__InvalidTileSelection();
         }
         if (betAmount == 0) {
-            revert TreasureTiles__BetAmountCantBeZero(betAmount);
+            revert TreasureTiles__BetAmountCantBeZero();
         }
 
         // Assign a unique game ID to the user
@@ -139,9 +153,6 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
 
         // Request randomness
         this.requestRandomness(abi.encodePacked(s_nextGameId));
-
-        // Emit an event to notify the frontend about the new game
-        emit GameStarted(s_nextGameId, selectedTiles, betAmount);
     }
 
     function requestRandomness(bytes memory _data) external {
@@ -174,35 +185,40 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
         game.fulfilledTime = block.timestamp;
         game.fulfilledBlock = block.number;
 
-        // Update the latest randomness and lastRequestId state variables
-        latestRandomness = bytes32(_randomness); // Keep if you need bytes32, otherwise just use _randomness
-        lastRequestId = uint64(_requestId);
-
-        uint256 normalizedValue = _randomness % ONE_THOUSAND;
         if (game.selectedTiles == 0 || game.selectedTiles > MAX_BOXES) {
             revert TreasureTiles__InvalidTileSelection();
         }
+        if (game.betAmount == 0) {
+            revert TreasureTiles__BetAmountCantBeZero();
+        }
+
+        // Update the latest randomness and lastRequestId state variables
+        latestRandomness = bytes32(_randomness); // Keep if you need bytes32, otherwise just use _randomness
+        lastRequestId = uint64(_requestId);
+        uint256 normalizedValue = _randomness % ONE_THOUSAND;
         uint256 currentProbability = s_probabilities[game.selectedTiles - 1];
+
         // Determine the game outcome
-        if (normalizedValue * ONE_E_FIFTEEN < currentProbability) {
-            // User lost, transfer betAmount to contract's balance
-            s_totalFees += game.betAmount; // Assuming all lost betAmounts are considered fees or to be pooled for
+        if (normalizedValue <= currentProbability * ONE_E_FIFTEEN) {
+            // User lost, add betAmount to liquidity pool instead of fees
+            s_liquidityPool += game.betAmount;
             // Delete the game from the mapping
             delete s_games[_requestId];
         } else {
             // User won, calculate wonAmount and fee
             uint256 wonAmount = game.betAmount * s_multipliers[game.selectedTiles - 1] / ONE_E_EIGHTEEN;
-            uint256 fee = wonAmount * SERVICE_FEE / ONE_THOUSAND; // Calculating the 0.5% fee
-            wonAmount -= fee; // Deducting the fee from the wonAmount
+            uint256 fee = (wonAmount * SERVICE_FEE) / ONE_E_THREE; // Calculating the 0.5% fee
+            uint256 wonAmountAfterFees = wonAmount - fee; // Deducting the fee from the wonAmount
             s_totalFees += fee; // Adding the fee to the total fees
 
+            // Delete the game from the mapping
+            delete s_games[_requestId];
+
             // Transfer wonAmount to the user
-            (bool success,) = payable(game.player).call{ value: wonAmount }("");
+            (bool success,) = payable(game.player).call{ value: wonAmountAfterFees }("");
             if (!success) {
                 revert TreasureTiles__TransactionFailed();
             }
-            // Delete the game from the mapping
-            delete s_games[_requestId];
         }
         emit RandomnessFulfilled(uint64(_requestId), game);
     }
@@ -223,14 +239,19 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
      * - `TreasureTiles__FailedToCollectFees` if the transfer of fees to the owner fails.
      */
     function collectFees() external onlyOwner {
-        if (s_totalFees <= 0) {
+        if (s_totalFees == 0) {
             revert TreasureTiles__NoFeesToCollect();
         }
-        (bool sent,) = owner().call{ value: s_totalFees }("");
+
+        uint256 feesToSend = s_totalFees;
+        s_totalFees = 0;
+
+        (bool sent,) = feeRecipient.call{ value: feesToSend }("");
         if (!sent) {
             revert TreasureTiles__FailedToCollectFees();
         }
-        s_totalFees = 0;
+
+        emit FeeCollected(feesToSend);
     }
 
     /**
@@ -254,5 +275,17 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
 
     function getServiceFee() external pure returns (uint256) {
         return SERVICE_FEE;
+    }
+
+    function getProbabilities() public view returns (uint256[25] memory) {
+        return s_probabilities;
+    }
+
+    function getMultipliers() public view returns (uint256[25] memory) {
+        return s_multipliers;
+    }
+
+    function getLiquidityPool() public view returns (uint256) {
+        return s_liquidityPool;
     }
 }

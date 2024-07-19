@@ -12,7 +12,7 @@ contract DeployTreasureTiles is Script {
 
         HelperConfig.NetworkConfig memory config = helperConfig.getActiveNetworkConfig();
 
-        TreasureTiles treasure = new TreasureTiles(config.initialOwner, config.initialOperator);
+        TreasureTiles treasure = new TreasureTiles(config.initialOwner, config.initialOperator, config.feeRecipient);
 
         return (treasure, helperConfig);
     }
