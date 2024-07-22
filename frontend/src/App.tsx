@@ -1,4 +1,8 @@
 import React from "react";
+import NavBar from "../src/components/navbar"
+import 'bootstrap/dist/css/bootstrap.css'
+import imagePath from '../../images/logo.png'
+import { ThirdwebProvider } from "thirdweb/react";
 
 type TileProps = {
   index: number;
@@ -100,26 +104,33 @@ function App() {
   };
 
   return (
-    <main className="grid w-full h-screen place-items-center">
-      <div className="grid grid-cols-2 gap-4 p-4 bg-gray-200 border rounded-lg border-gray-400/25">
-        <div className="flex flex-col justify-between rounded-lg">
-          <BetWidget
-            handleStartGame={handleStartGame}
-            handleReset={handleReset}
-          />
-        </div>
-        <div className="grid grid-cols-5 grid-rows-5 gap-4">
-          {Array.from({ length: TILE_COUNT }).map((_, index) => (
-            <Tile
-              key={index}
-              index={index}
-              state={states[index]}
-              modifyTileState={(newState) => modifyTileState(index, newState)}
+    <ThirdwebProvider>
+    <div>
+      <NavBar 
+      brandName="Treasure Tiles"
+      imageSrcPath={imagePath} />
+      <main className="grid w-full h-screen place-items-center">
+        <div className="grid grid-cols-2 gap-4 p-4 bg-gray-200 border rounded-lg border-gray-400/25">
+          <div className="flex flex-col justify-between rounded-lg">
+            <BetWidget
+              handleStartGame={handleStartGame}
+              handleReset={handleReset}
             />
-          ))}
+          </div>
+          <div className="grid grid-cols-5 grid-rows-5 gap-4">
+            {Array.from({ length: TILE_COUNT }).map((_, index) => (
+              <Tile
+                key={index}
+                index={index}
+                state={states[index]}
+                modifyTileState={(newState) => modifyTileState(index, newState)}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
+    </ThirdwebProvider>
   );
 }
 
