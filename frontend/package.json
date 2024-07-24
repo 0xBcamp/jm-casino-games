@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "abitype": "^1.0.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "thirdweb": "^5.37.0"

@@ -1,16 +1,20 @@
 import { ConnectButton } from "thirdweb/react";
-import { createThirdwebClient } from "thirdweb";
+import { defineChain, ThirdwebClient } from "thirdweb";
+import { sepolia } from "thirdweb/chains";
 
-
-const client = createThirdwebClient({ clientId: "a1160023f3d1c79e1d3daaa691841217" });
-
+const modeNetwork = defineChain({
+    name: "Mode",
+    id: 34443,
+    rpc: "https://mainnet.mode.network/",
+});
 
 interface NavBarProps {
     brandName: string;
     imageSrcPath: string;
+    client: ThirdwebClient;
 }
 
-function NavBar({ brandName, imageSrcPath }: NavBarProps) {
+function NavBar({ brandName, imageSrcPath, client }: NavBarProps) {
     return (
         <nav className="navbar navbar-expand-md navbar-dark bg-dark shadow">
             <div className="container-fluid">
@@ -25,7 +29,8 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
                         {brandName}
                     </span>
                 </a>
-                <ConnectButton client={client}/>
+                {/* use modeNetwork in production */}
+                <ConnectButton client={client} chain={sepolia}/>
             </div>
         </nav>
     )
