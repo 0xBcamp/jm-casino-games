@@ -110,7 +110,7 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
 
     // Events
     event RandomnessRequested(uint64 indexed requestId);
-    event RandomnessFulfilled(uint256 indexed nonce, Game);
+    event RandomnessFulfilled(uint256 indexed gameId, uint256 indexed nonce, Game);
     event FeeCollected(uint256 indexed amount);
 
     /**
@@ -161,7 +161,7 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
      * Emits:
      * - `RandomnessRequested`: Indicates that a new randomness request has been made.
      */
-    function startGame(uint256 selectedTiles, uint256 betAmount) external payable {
+    function startGame(uint256 selectedTiles, uint256 betAmount) external payable returns (uint256) {
         // Validate inputs
         if (selectedTiles == 0 || selectedTiles > MAX_BOXES) {
             revert TreasureTiles__InvalidTileSelection();
@@ -185,6 +185,7 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
 
         // Request randomness
         this.requestRandomness(abi.encodePacked(s_nextGameId));
+        return s_nextGameId;
     }
 
     /**
@@ -283,7 +284,7 @@ contract TreasureTiles is GelatoVRFConsumerBase, ReentrancyGuard, Ownable {
                 revert TreasureTiles__TransactionFailed();
             }
         }
-        emit RandomnessFulfilled(uint64(_requestId), game);
+        emit RandomnessFulfilled(gameId, uint64(_requestId), game);
     }
 
     /**
