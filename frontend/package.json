@@ -10,9 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@thirdweb-dev/react": "^4.9.4",
     "@thirdweb-dev/sdk": "^4.0.99",
     "ethers": "^5.7.2",
+=======
+    "abitype": "^1.0.5",
+>>>>>>> e3998a6c9429f124a123c997c5595cd0bdac9ee8
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "thirdweb": "^5.37.0"

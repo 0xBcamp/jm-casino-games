@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import NavBar from "../src/components/navbar"
-import 'bootstrap/dist/css/bootstrap.css'
 import imagePath from '../../images/logo.png'
+<<<<<<< HEAD
 import { ThirdwebProvider } from "thirdweb/react";
 useSendTransaction
 import { prepareContractCall, getContract } from "thirdweb";
@@ -24,6 +24,22 @@ function startGame(amount: number) {
   const { mutate: sendTransaction, isPending } = useSendTransaction();
 
 }
+=======
+import { ThirdwebProvider, useContractEvents, useSendAndConfirmTransaction } from "thirdweb/react";
+import { getContract, createThirdwebClient, ThirdwebContract, prepareContractCall, toWei, prepareEvent } from "thirdweb";
+import { sepolia } from "thirdweb/chains";
+import treasureTilesABI from "./ABI/TreasureTiles.json";
+import { Abi } from "abitype";
+
+const client = createThirdwebClient({ clientId: "a1160023f3d1c79e1d3daaa691841217" });
+
+const treasureTilesContract = getContract({
+  client,
+  chain: sepolia,
+  address: "0xdaE97900D4B184c5D2012dcdB658c008966466DD",
+  abi: treasureTilesABI as Abi,
+});
+>>>>>>> e3998a6c9429f124a123c997c5595cd0bdac9ee8
 
 type TileProps = {
   index: number;
@@ -64,17 +80,27 @@ function BetWidget({
   handleStartGame,
   handleReset,
 }: {
-  handleStartGame: () => void;
+  handleStartGame: (betAmount: number) => void;
   handleReset: () => void;
 }) {
+  const [betAmount, setBetAmount] = useState(0);
+  const handleBetAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setBetAmount(Number(event.target.value));
+  }
+
+  const handleStart = () => {
+    handleStartGame(betAmount);
+  }
   return (
     <>
       <label className="flex flex-col gap-4">
-        Bet Amount
+        Bet Amount (in ETH)
         <input
-          type="text"
+          type="number"
           placeholder="Enter bet amount"
           className="p-2 border border-gray-400 rounded-lg bg-gray-50"
+          // value={betAmount}
+          onChange={handleBetAmountChange}
         />
       </label>
       <div className="flex items-center w-full gap-4">
@@ -85,7 +111,7 @@ function BetWidget({
           Reset
         </button>
         <button
-          onClick={handleStartGame}
+          onClick={handleStart}
           className="grid w-full px-4 py-3 text-indigo-900 bg-indigo-200 rounded-lg place-items-center"
         >
           Start Game
@@ -100,6 +126,17 @@ function App() {
     Array.from({ length: TILE_COUNT }).map(() => "unclicked")
   );
 
+  const { mutate: sendTransaction, data: transactionReceipt } = useSendAndConfirmTransaction();
+  // const { data, isLoading, error } = useContractEvents (treasureTilesContract as ThirdwebContract);
+  // const randomnessFulfilledEvent = prepareEvent({
+  //   signature: "event RandomnessFulfilled(uint256 indexed nonce, Game)"
+  // })
+  
+  // const contractEvents = useContractEvents({
+  //   contract: treasureTilesContract as ThirdwebContract,
+  //   events: [randomnessFulfilledEvent],
+  // });
+
   const modifyTileState = (index: number, newState: TileState) => {
     setStates((prevStates) => {
       const newStates = [...prevStates];
@@ -108,16 +145,37 @@ function App() {
     });
   };
 
-  const handleStartGame = () => {
-    setStates((prevStates) => {
-      const newStates = [...prevStates];
-      for (let i = 0; i < TILE_COUNT; i++) {
-        if (prevStates[i] === "clicked") {
-          newStates[i] = Math.random() < 1 / 25 ? "mine" : "gem";
-        }
-      }
-      return newStates;
+  const handleStartGame = async (betAmount: number) => {
+    // setStates((prevStates) => {
+    //   const newStates = [...prevStates];
+    //   for (let i = 0; i < TILE_COUNT; i++) {
+    //     if (prevStates[i] === "clicked") {
+    //       newStates[i] = Math.random() < 1 / 25 ? "mine" : "gem";
+    //     }
+    //   }
+    //   return newStates;
+    // });
+    const clicked = states.filter((state) => state === "clicked").length;
+    if (clicked === 0) {
+      alert("Please click on some tiles first");
+      return;
+    }
+    if (betAmount === 0) {
+      alert("Please enter a bet amount");
+      return;
+    }
+
+    const betInWei = toWei (betAmount.toString());
+
+    const tx = prepareContractCall({
+      contract: treasureTilesContract as ThirdwebContract,
+      method: "function startGame(uint256 selectedTiles, uint256 betAmount)",
+      params: [BigInt (clicked), BigInt (betInWei)],
+      value: BigInt (betInWei),
     });
+
+    sendTransaction(tx);
+
   };
 
   const handleReset = () => {
@@ -125,34 +183,54 @@ function App() {
   };
 
   return (
-    <ThirdwebProvider>
-    <div>
-      <NavBar 
-      brandName="Treasure Tiles"
-      imageSrcPath={imagePath} />
-      <main className="grid w-full h-screen place-items-center">
-        <div className="grid grid-cols-2 gap-4 p-4 bg-gray-200 border rounded-lg border-gray-400/25">
-          <div className="flex flex-col justify-between rounded-lg">
-            <BetWidget
-              handleStartGame={handleStartGame}
-              handleReset={handleReset}
-            />
-          </div>
-          <div className="grid grid-cols-5 grid-rows-5 gap-4">
-            {Array.from({ length: TILE_COUNT }).map((_, index) => (
-              <Tile
-                key={index}
-                index={index}
-                state={states[index]}
-                modifyTileState={(newState) => modifyTileState(index, newState)}
-              />
-            ))}
-          </div>
+        <div>
+          <NavBar 
+          imageSrcPath={imagePath}
+          brandName="Treasure Tiles"
+          client={client} />
+          <main className="grid w-full h-screen place-items-center">
+            <div className="grid grid-cols-2 gap-4 p-4 bg-gray-200 border rounded-lg border-gray-400/25">
+              <div className="flex flex-col justify-between rounded-lg">
+                <BetWidget
+                  handleStartGame={handleStartGame}
+                  handleReset={handleReset}
+                />
+              </div>
+              <div className="grid grid-cols-5 grid-rows-5 gap-4">
+                {Array.from({ length: TILE_COUNT }).map((_, index) => (
+                  <Tile
+                    key={index}
+                    index={index}
+                    state={states[index]}
+                    modifyTileState={(newState) => modifyTileState(index, newState)}
+                  />
+                ))}
+              </div>
+            </div>
+            <div>
+            </div>
+            <div>
+              {transactionReceipt && (
+                <div>
+                  <h2>Transaction Receipt</h2>
+                  <pre>{transactionReceipt.status}</pre>
+                  {contractEvents.data && (
+                    <pre>{JSON.stringify(contractEvents.data, null, 2)}</pre>
+                  )}
+                </div>
+              )}
+            </div>
+          </main>
         </div>
-      </main>
-    </div>
-    </ThirdwebProvider>
   );
 }
 
-export default App;
+function AppWrapper () {
+  return (
+    <ThirdwebProvider>
+      <App />
+    </ThirdwebProvider>
+  )
+}
+
+export default AppWrapper;
