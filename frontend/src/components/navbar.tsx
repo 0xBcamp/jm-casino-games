@@ -2,7 +2,7 @@ import { ConnectButton } from "thirdweb/react";
 import { createThirdwebClient } from "thirdweb";
 
 
-const client = createThirdwebClient({ clientId: "a1160023f3d1c79e1d3daaa691841217" });
+export const client = createThirdwebClient({ clientId: "a1160023f3d1c79e1d3daaa691841217" });
 
 
 interface NavBarProps {
@@ -20,15 +20,17 @@ function NavBar({ brandName, imageSrcPath }: NavBarProps) {
                         alt=""
                         width="60"
                         height="100"
-                        className="d-inline-block align-text-centre" />
+                        className="d-inline-block align-text-center" />
                     <span className="fw-bolder fs-4">
-                        {brandName}
+                         {brandName}
                     </span>
                 </a>
-                <ConnectButton client={client}/>
+                <div className="ml-auto">
+                    <ConnectButton  client={client}/>
+                </div>
             </div>
         </nav>
-    )
+    );
 }
 
 export default NavBar;

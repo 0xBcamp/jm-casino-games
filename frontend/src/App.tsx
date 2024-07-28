@@ -3,6 +3,27 @@ import NavBar from "../src/components/navbar"
 import 'bootstrap/dist/css/bootstrap.css'
 import imagePath from '../../images/logo.png'
 import { ThirdwebProvider } from "thirdweb/react";
+useSendTransaction
+import { prepareContractCall, getContract } from "thirdweb";
+import { client } from "../src/components/navbar"
+import { sepolia } from "thirdweb/chains";
+
+
+interface startGameProps {
+  amount: ;
+  selectedTiles: string;
+}
+
+function startGame(amount: number) {
+  const contract = getContract({
+    client,
+    chain: sepolia,
+    address: "0xdaE97900D4B184c5D2012dcdB658c008966466DD"
+  });
+
+  const { mutate: sendTransaction, isPending } = useSendTransaction();
+
+}
 
 type TileProps = {
   index: number;
