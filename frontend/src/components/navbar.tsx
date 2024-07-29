@@ -1,13 +1,6 @@
 import { ConnectButton } from "thirdweb/react";
-<<<<<<< HEAD
-import { createThirdwebClient } from "thirdweb";
-
-
-export const client = createThirdwebClient({ clientId: "a1160023f3d1c79e1d3daaa691841217" });
-=======
 import { defineChain, ThirdwebClient } from "thirdweb";
 import { sepolia } from "thirdweb/chains";
->>>>>>> e3998a6c9429f124a123c997c5595cd0bdac9ee8
 
 const modeNetwork = defineChain({
     name: "Mode",
@@ -24,26 +17,22 @@ interface NavBarProps {
 function NavBar({ brandName, imageSrcPath, client }: NavBarProps) {
     return (
         <nav className="navbar navbar-expand-md navbar-dark bg-dark shadow">
-            <div className="container-fluid">
-                <a className="navbar-brand" href="#">
+            <div className="container-fluid d-flex align-items-center">
+                <a className="navbar-brand d-flex align-items-center" href="#">
                     <img
                         src={imageSrcPath}
-                        alt=""
+                        alt="Brand Logo"
                         width="60"
                         height="100"
                         className="d-inline-block align-text-center" />
-                    <span className="fw-bolder fs-4">
-                         {brandName}
+                    <span className="fw-bolder fs-4 ms-2">
+                        {brandName}
                     </span>
                 </a>
-<<<<<<< HEAD
-                <div className="ml-auto">
-                    <ConnectButton  client={client}/>
+                <div className="ms-auto"> {/* Use ms-auto for right alignment */}
+                    {/* Use modeNetwork in production */}
+                    <ConnectButton client={client} chain={sepolia} />
                 </div>
-=======
-                {/* use modeNetwork in production */}
-                <ConnectButton client={client} chain={sepolia}/>
->>>>>>> e3998a6c9429f124a123c997c5595cd0bdac9ee8
             </div>
         </nav>
     );

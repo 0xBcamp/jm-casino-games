@@ -1,30 +1,6 @@
 import React, { useState } from "react";
 import NavBar from "../src/components/navbar"
 import imagePath from '../../images/logo.png'
-<<<<<<< HEAD
-import { ThirdwebProvider } from "thirdweb/react";
-useSendTransaction
-import { prepareContractCall, getContract } from "thirdweb";
-import { client } from "../src/components/navbar"
-import { sepolia } from "thirdweb/chains";
-
-
-interface startGameProps {
-  amount: ;
-  selectedTiles: string;
-}
-
-function startGame(amount: number) {
-  const contract = getContract({
-    client,
-    chain: sepolia,
-    address: "0xdaE97900D4B184c5D2012dcdB658c008966466DD"
-  });
-
-  const { mutate: sendTransaction, isPending } = useSendTransaction();
-
-}
-=======
 import { ThirdwebProvider, useContractEvents, useSendAndConfirmTransaction } from "thirdweb/react";
 import { getContract, createThirdwebClient, ThirdwebContract, prepareContractCall, toWei, prepareEvent } from "thirdweb";
 import { sepolia } from "thirdweb/chains";
@@ -39,7 +15,6 @@ const treasureTilesContract = getContract({
   address: "0xdaE97900D4B184c5D2012dcdB658c008966466DD",
   abi: treasureTilesABI as Abi,
 });
->>>>>>> e3998a6c9429f124a123c997c5595cd0bdac9ee8
 
 type TileProps = {
   index: number;
@@ -125,6 +100,7 @@ function App() {
   const [states, setStates] = React.useState<TileState[]>(
     Array.from({ length: TILE_COUNT }).map(() => "unclicked")
   );
+  
 
   const { mutate: sendTransaction, data: transactionReceipt } = useSendAndConfirmTransaction();
   // const { data, isLoading, error } = useContractEvents (treasureTilesContract as ThirdwebContract);
@@ -213,10 +189,10 @@ function App() {
               {transactionReceipt && (
                 <div>
                   <h2>Transaction Receipt</h2>
-                  <pre>{transactionReceipt.status}</pre>
-                  {contractEvents.data && (
-                    <pre>{JSON.stringify(contractEvents.data, null, 2)}</pre>
-                  )}
+              <pre>{transactionReceipt.status}</pre>
+              {contractEvents.data && (
+                <pre>{JSON.stringify(contractEvents.data, null, 2)}</pre>
+              )}
                 </div>
               )}
             </div>
